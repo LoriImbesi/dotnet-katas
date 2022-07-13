@@ -10,7 +10,16 @@ namespace CodeProject.Tests
     [TestFixture]
     public class PrimeControllerTest
     {
+        private readonly IGoodLogger _goodLogger; 
+        private readonly ICacheService _cacheService;
+        private readonly IPrimeService _primeService;
 
+        public PrimeControllerTest()
+        {
+            _goodLogger = A.Fake<IGoodLogger>();
+            _cacheService = A.Fake<ICacheService>();
+            _primeService = A.Fake<IPrimeService>();
+        }
 // Mockist testing, not classical - mocking is common for C#
 
         [Test]
@@ -44,25 +53,24 @@ namespace CodeProject.Tests
         [Test]
         public async Task CachePrimes_IsNotPrime_PutsNothingInCacheAndLogsError()
         {
-            // Arrange mocks
+            // Arrange
             var fakeGoodLogger = A.Fake<IGoodLogger>();
-            var fakePrimeService = A.Fake<IPrimeService>();
             var fakeCacheService = A.Fake<ICacheService>();
+            var fakePrimeService = A.Fake<IPrimeService>();
             var primeController = new PrimeController(fakeGoodLogger, fakeCacheService, fakePrimeService);
-            
-            A.CallTo(() => fakePrimeService.IsPrime(4)).Returns(Task.FromResult(false));
-            
-            // call System Under Test (SUT) aka "ACT"
-            await primeController.CachePrimes(4);
 
-            // Assert calls happened
+            A.CallTo(() => fakePrimeService.IsPrime(4)).Returns(Task.FromResult<bool>(false));
+
+            // Act
+
+            await primeController.CachePrimes(4);
+            
+            // Assert
             A.CallTo(() => fakePrimeService.IsPrime(4)).MustHaveHappenedOnceExactly();
             A.CallTo(() => fakeCacheService.Set(4)).MustNotHaveHappened();
             A.CallTo(() => fakeGoodLogger.LogInfo("4 was prime")).MustNotHaveHappened();
             A.CallTo(() => fakeGoodLogger.LogError("4 wasn't prime")).MustHaveHappenedOnceExactly();
 
-
-            
         }
     }
 }

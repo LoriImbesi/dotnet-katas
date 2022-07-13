@@ -24,7 +24,7 @@ namespace CodeProject
     // This is the interface and shape of the function, not the actual function itself
     public interface IPrimeService
     {
-        Task<bool> IsPrime(int candidate); // returns a Task with or of a boolean;
+        Task<bool> IsPrime(int candidate); // returns a Task with/of a boolean;
         
     }
 
